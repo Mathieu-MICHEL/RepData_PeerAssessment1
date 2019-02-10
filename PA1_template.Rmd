@@ -225,4 +225,6 @@ For information, would I be interested in comparing visually the two distributio
         p + geom_area(position = "identity") +
                 theme(legend.position = c(0.8, 0.8))
 
+
 ```
+
