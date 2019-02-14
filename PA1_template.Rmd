@@ -1,7 +1,7 @@
 ---
 title: "Reproducible Research: Peer Assessment 1"
 author: "Mathieu MICHEL"
-date: "2019-02-10"
+date: "2019-02-14"
 output: html_document
 keep_md: true
 ---
@@ -107,7 +107,7 @@ About missing values, I can easily compute:
 
 Which gives me **`r sum(is.na(data$steps))` missing values**.
 
-Here, the idea is that means of steps per interval have already been computed and that it seems realistic to use the mean per interval to fill missing values (instead of the mean per day: I walk on a relatively constant daily pattern myself, while behaving very differently at 4.30 am and 5.30pm, somewhat independantly of the day).
+Here, the idea is that means of steps per interval have already been computed and that it seems realistic to use the mean per interval to fill missing values (instead of the mean per day: I walk on a relatively constant daily pattern myself, while behaving very differently at 4.30am and 5.30pm, somewhat independantly of the day).
 
 I will replace NAs by the **mean for the corresponding interval** accross available observations:
 
@@ -171,6 +171,7 @@ I then compute aggregated values on two subset of the data, depending on the day
         
 
 ```{r}        
+        # I compute the mean on weekdays.
         data.by.interval.NoNA.weekday <- aggregate(
                 data.NoNA[data.NoNA$day.type == "weekday",]$steps, 
                 by = list(data.NoNA[data.NoNA$day.type == "weekday",]$interval), 
@@ -178,6 +179,7 @@ I then compute aggregated values on two subset of the data, depending on the day
                                            na.rm=TRUE, 
                                            na.action=NULL)
         
+        # I compute the mean on weekends.
         data.by.interval.NoNA.weekend <- aggregate(
                 data.NoNA[data.NoNA$day.type == "weekend",]$steps, 
                 by = list(data.NoNA[data.NoNA$day.type == "weekend",]$interval), 
@@ -185,6 +187,7 @@ I then compute aggregated values on two subset of the data, depending on the day
                 na.rm=TRUE, 
                 na.action=NULL)
         
+        # I join both calculation linked on the corresponding interval
         data.by.interval.NoNA <- left_join(data.by.interval.NoNA.weekday,
                                       data.by.interval.NoNA.weekend, 
                                       by = "Group.1")
@@ -195,7 +198,8 @@ I then compute aggregated values on two subset of the data, depending on the day
         
         data.by.interval.NoNA <- as.tibble(data.by.interval.NoNA)
         
-        
+        # Here I want to change the organization of my table
+        # I want a day.type with value weekday/weekend, instead of 2 variables
         data.by.interval.NoNA <- gather(data.by.interval.NoNA, `weekday`,
                                         `weekend`,
                                         key = "day.type", 
