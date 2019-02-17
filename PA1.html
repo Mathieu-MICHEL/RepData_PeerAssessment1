@@ -11,7 +11,7 @@
 
 <meta name="author" content="Mathieu MICHEL" />
 
-<meta name="date" content="2019-02-14" />
+<meta name="date" content="2019-02-17" />
 
 <title>Reproducible Research: Peer Assessment 1</title>
 
@@ -187,7 +187,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">Reproducible Research: Peer Assessment 1</h1>
 <h4 class="author"><em>Mathieu MICHEL</em></h4>
-<h4 class="date"><em>2019-02-14</em></h4>
+<h4 class="date"><em>2019-02-17</em></h4>
 
 </div>
 
@@ -263,7 +263,7 @@ data.by.interval[data.by.interval$avg.steps==max(data.by.interval$avg.steps),]$i
 <pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's 
 ##    0.00    0.00    0.00   37.38   12.00  806.00    2304</code></pre>
 <p>Which gives me <strong>2304 missing values</strong>.</p>
-<p>Here, the idea is that means of steps per interval have already been computed and that it seems realistic to use the mean per interval to fill missing values (instead of the mean per day: I walk on a relatively constant daily pattern myself, while behaving very differently at 4.30am and 5.30pm, somewhat independantly of the day).</p>
+<p>Here, the idea is that means of steps per interval have already been computed and that it seems realistic to use the mean per interval to fill missing values (instead of the mean per day: I walk on a relatively constant daily pattern myself, while behaving very differently at 4.30 am and 5.30pm, somewhat independantly of the day).</p>
 <p>I will replace NAs by the <strong>mean for the corresponding interval</strong> accross available observations:</p>
 <pre class="r"><code>        data.NoNA &lt;- left_join(data,data.by.interval, by = &quot;interval&quot;)
         
@@ -307,15 +307,13 @@ data.by.interval[data.by.interval$avg.steps==max(data.by.interval$avg.steps),]$i
    
         data.NoNA %&lt;&gt;% mutate(day.type = as.factor(day.type))</code></pre>
 <p>I then compute aggregated values on two subset of the data, depending on the day.type.</p>
-<pre class="r"><code>        # I compute the mean on weekdays.
-        data.by.interval.NoNA.weekday &lt;- aggregate(
+<pre class="r"><code>        data.by.interval.NoNA.weekday &lt;- aggregate(
                 data.NoNA[data.NoNA$day.type == &quot;weekday&quot;,]$steps, 
                 by = list(data.NoNA[data.NoNA$day.type == &quot;weekday&quot;,]$interval), 
                                            mean,
                                            na.rm=TRUE, 
                                            na.action=NULL)
         
-        # I compute the mean on weekends.
         data.by.interval.NoNA.weekend &lt;- aggregate(
                 data.NoNA[data.NoNA$day.type == &quot;weekend&quot;,]$steps, 
                 by = list(data.NoNA[data.NoNA$day.type == &quot;weekend&quot;,]$interval), 
@@ -323,7 +321,6 @@ data.by.interval[data.by.interval$avg.steps==max(data.by.interval$avg.steps),]$i
                 na.rm=TRUE, 
                 na.action=NULL)
         
-        # I join both calculation linked on the corresponding interval
         data.by.interval.NoNA &lt;- left_join(data.by.interval.NoNA.weekday,
                                       data.by.interval.NoNA.weekend, 
                                       by = &quot;Group.1&quot;)
@@ -334,8 +331,7 @@ data.by.interval[data.by.interval$avg.steps==max(data.by.interval$avg.steps),]$i
         
         data.by.interval.NoNA &lt;- as.tibble(data.by.interval.NoNA)
         
-        # Here I want to change the organization of my table
-        # I want a day.type with value weekday/weekend, instead of 2 variables
+        
         data.by.interval.NoNA &lt;- gather(data.by.interval.NoNA, `weekday`,
                                         `weekend`,
                                         key = &quot;day.type&quot;, 
